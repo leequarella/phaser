@@ -17,4 +17,7 @@
 //= require player
 //= require user_input
 //= require spawn
+//= require text
+//= require gun
+//= require store
 //= require game

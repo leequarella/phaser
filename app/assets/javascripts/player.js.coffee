@@ -1,8 +1,10 @@
-class Player
+class @Player
   constructor: ->
+    @score = 0
     @coins = 0
-    @rateOfFire = 2
-    @lastFired = Date.now()
+    @speed = 10
+    @maxSpeed = 150
+    @Gun = new Gun
 
   createSprite: ->
     @sprite = game.add.sprite(200,200, 'player')
@@ -11,21 +13,10 @@ class Player
     @sprite.anchor.set(0.5)
     game.camera.follow(@sprite)
 
-  fire: ->
-    return if (@lastFired > Date.now() - (1000/@rateOfFire)) || gameOver
-    @lastFired = Date.now()
-    bullet = bullets.create(@sprite.body.x, @sprite.body.y, 'bullet')
-    bullets.setAll('checkWorldBounds', true)
-    bullets.setAll('outOfBoundsKill', true)
-    game.physics.arcade.moveToPointer(bullet, 300)
+  fire: -> @Gun.fire(@sprite.body.x, @sprite.body.y)
 
   crash: (playerSprite) ->
-    gameOverText = game.add.text(301, 301, 'GAME OVER', { fontSize: '64px', fill: '#fff' })
-    gameOverTextShadow = game.add.text(300, 300, 'GAME OVER', { fontSize: '64px', fill: '#f00' })
-    gameOverText.fixedToCamera = true
-    gameOverText.cameraOffset.setTo(300,300)
-    gameOverTextShadow.fixedToCamera = true
-    gameOverTextShadow.cameraOffset.setTo(301,301)
+    Text.addGameOver()
     playerSprite.kill()
     window.gameOver = true
 
@@ -33,4 +24,19 @@ class Player
     window.Player.coins += 1
     coin.kill()
 
-window.Player = new Player
+  reset: ->
+    @sprite.kill()
+    @score = 0
+    @createSprite()
+
+  accelerate: (coord, magnitude) ->
+    if magnitude == "+"
+      @sprite.body.velocity[coord] += @speed unless @sprite.body.velocity[coord] > @maxSpeed
+    else
+      @sprite.body.velocity[coord] -= @speed unless @sprite.body.velocity[coord] < (-1 * @maxSpeed)
+
+  decelerate: (object, coord)->
+    if @sprite.body.velocity[coord] > 0
+      @sprite.body.velocity[coord] -= 1
+    else if @sprite.body.velocity[coord] < 0
+      @sprite.body.velocity[coord] += 1
