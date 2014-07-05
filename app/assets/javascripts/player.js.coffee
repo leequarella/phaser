@@ -7,36 +7,46 @@ class @Player
     @Gun = new Gun
 
   createSprite: ->
-    @sprite = game.add.sprite(200,200, 'player')
-    game.physics.arcade.enable(@sprite)
+    @CollisionGroup = game.physics.p2.createCollisionGroup()
+    @sprite = game.add.sprite(200,200, 'ship1')
+    game.physics.p2.enable(@sprite)
+    game.camera.follow(@sprite)
+    @sprite.body.setRectangle 17, 35
+    @sprite.animations.add('thrust', [1, 2, 3, 4], 10, true)
     @sprite.body.collideWorldBounds = true
     @sprite.anchor.set(0.5)
-    game.camera.follow(@sprite)
+    @sprite.body.setCollisionGroup(@CollisionGroup)
+    @sprite.body.collides(coinsCollisionGroup, Player.collect, this)
+    @sprite.body.collides(baddiesCollisionGroup, Player.crash, this)
 
   fire: -> @Gun.fire(@sprite.body.x, @sprite.body.y)
 
-  crash: (playerSprite) ->
+  crash: (object) ->
     Text.addGameOver()
-    playerSprite.kill()
+    window.Player.sprite.kill()
     window.gameOver = true
 
-  collect: (playerSprite, coin) ->
+  collect: (itemBody) ->
     window.Player.coins += 1
-    coin.kill()
+    itemBody.sprite.kill()
 
   reset: ->
     @sprite.kill()
     @score = 0
     @createSprite()
 
-  accelerate: (coord, magnitude) ->
-    if magnitude == "+"
-      @sprite.body.velocity[coord] += @speed unless @sprite.body.velocity[coord] > @maxSpeed
-    else
-      @sprite.body.velocity[coord] -= @speed unless @sprite.body.velocity[coord] < (-1 * @maxSpeed)
+  rotateRight: -> @sprite.body.rotateRight(100)
+  rotateLeft:  -> @sprite.body.rotateLeft(100)
+  noRotate:    -> @sprite.body.setZeroRotation()
 
-  decelerate: (object, coord)->
-    if @sprite.body.velocity[coord] > 0
-      @sprite.body.velocity[coord] -= 1
-    else if @sprite.body.velocity[coord] < 0
-      @sprite.body.velocity[coord] += 1
+  accelerate: ->
+    @sprite.animations.play('thrust', 30, true)
+    @sprite.body.thrust(400)
+
+  decelerate: ()->
+    @sprite.animations.stop()
+    @sprite.frame = 0
+
+  brake: ()->
+    @sprite.animations.stop()
+    @sprite.frame = 0

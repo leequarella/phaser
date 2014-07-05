@@ -1,7 +1,7 @@
 class Store
   upgradeRateOfFire: (amount) ->
-    return Text.insufficientFunds() if Player.coins < 1
-    Player.coins -= 1
+    return Text.insufficientFunds() if Player.coins < 10
+    Player.coins -= 10
     Player.Gun.rateOfFire += parseInt(amount) || 1
 
   upgradeBulletSpeed: (amount) ->

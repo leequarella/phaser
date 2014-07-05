@@ -3,16 +3,16 @@ class UserInput
     Player.fire() if game.input.activePointer.isDown
     Player.sprite.rotation = game.physics.arcade.angleToPointer(Player.sprite)
     if game.input.keyboard.isDown(Phaser.Keyboard.A)
-      Player.accelerate('x', '-')
+      Player.rotateLeft()
     else if game.input.keyboard.isDown(68)
-      Player.accelerate('x', '+')
+      Player.rotateRight()
     else
-      Player.decelerate('x')
+      Player.noRotate()
     if game.input.keyboard.isDown(Phaser.Keyboard.W)
-      Player.accelerate('y', '-')
+      Player.accelerate()
     else if game.input.keyboard.isDown(Phaser.Keyboard.S)
-      Player.accelerate('y', '+')
+      Player.brake()
     else
-      Player.decelerate('y')
+      Player.decelerate()
 
 window.UserInput = new UserInput

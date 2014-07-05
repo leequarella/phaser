@@ -13,7 +13,8 @@
 //= require jquery
 //= require jquery_ujs
 //= require turbolinks
-//= require phaser
+//= require lib/phaser
+//= require lib/game_helpers
 //= require player
 //= require user_input
 //= require spawn

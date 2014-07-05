@@ -8,8 +8,11 @@ class @Gun
     return if (@lastFired > Date.now() - (1000/@rateOfFire)) || gameOver
     @lastFired = Date.now()
     bullet = bullets.create(originX, originY, 'bullet')
-    bullet.scale.x = 0.5
-    bullet.scale.y = 0.5
+    game.physics.p2.enable bullet
+    bullet.scale.set 0.5
     bullets.setAll('checkWorldBounds', true)
     bullets.setAll('outOfBoundsKill', true)
+    bullet.body.setCollisionGroup(bulletsCollisionGroup)
+    bullet.body.collides([baddiesCollisionGroup])
+    setTimeout (=> bullet.kill()), 3000
     game.physics.arcade.moveToPointer(bullet, @bulletSpeed)
