@@ -13,7 +13,6 @@ class @Player
     game.camera.follow(@sprite)
     @sprite.body.setRectangle 17, 35
     @sprite.animations.add('thrust', [1, 2, 3, 4], 10, true)
-    @sprite.body.collideWorldBounds = true
     @sprite.anchor.set(0.5)
     @sprite.body.setCollisionGroup(@CollisionGroup)
     @sprite.body.collides(coinsCollisionGroup, Player.collect, this)

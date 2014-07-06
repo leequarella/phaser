@@ -2,29 +2,53 @@ $ -> init()
 
 @init = ->
   window.game = new Phaser.Game(800,600, Phaser.AUTO, "",
-    {preload: preload, create: create, update: update})
+    {preload: Game.preload, create: Game.create, update: Game.update})
 
-@preload = ->
-  game.load.image('background',    'assets/starfield.jpg')
-  game.load.image('bullet',        'assets/star.png')
-  game.load.image('reset_button',  'assets/reset_button.png')
-  game.load.image('yellow_button', 'assets/yellow_button.png')
-  game.load.image('player',        'assets/ship.png')
-  game.load.image('dude1',         'assets/baddie_ball.png')
-  game.load.image('dude2',         'assets/dude_single.png')
-  game.load.image('coin',          'assets/coin.png')
-  game.load.spritesheet('ship1',   'assets/ship_anim.png', 17, 30)
+class Game
+  @preload: ->
+    game.load.image('background',    'assets/starfield.jpg')
+    game.load.image('bullet',        'assets/star.png')
+    game.load.image('reset_button',  'assets/reset_button.png')
+    game.load.image('yellow_button', 'assets/yellow_button.png')
+    game.load.image('player',        'assets/ship.png')
+    game.load.image('dude1',         'assets/baddie_ball.png')
+    game.load.image('dude2',         'assets/dude_single.png')
+    game.load.image('coin',          'assets/coin.png')
+    game.load.spritesheet('ship1',   'assets/ship_anim.png', 17, 30)
 
-@create = ->
-  setupWorld()
-  createCollisionGroups()
+  @create: ->
+    setupWorld()
+    createCollisionGroups()
+    window.Player = new Player
+    Player.createSprite()
+    Text.init()
+    createGroups()
 
-  window.Player = new Player
-  Player.createSprite()
+  @update: ->
+    Spawn.baddies()
+    UserInput.handle()
+    Text.update()
+    for coin in coins.children
+      if Phaser.distanceBetween(coin, Player.sprite) < 200
+        Phaser.accelerateToObject(coin, Player.sprite, 100)
 
-  Text.init()
+    stopAtWorldBounds(Player.sprite)
+window.Game = new Game
 
-  createGroups()
+@stopAtWorldBounds = (sprite) ->
+  #console.log sprite.body.x, game.world.bounds.x
+  if (sprite.body.x < 0)
+    sprite.body.setZeroVelocity()
+    sprite.body.x = 1
+  else if (sprite.body.x > game.world.bounds.width)
+    sprite.body.setZeroVelocity()
+    sprite.body.x = game.world.bounds.width
+  if (sprite.body.y < 0)
+    sprite.body.setZeroVelocity()
+    sprite.body.y = 1
+  else if (sprite.body.y > game.world.bounds.height)
+    sprite.body.setZeroVelocity()
+    sprite.body.y = game.world.bounds.height
 
 @setupWorld = ->
   game.add.tileSprite(0, 0, 2000, 2000, 'background')
@@ -49,13 +73,6 @@ $ -> init()
   window.gameOver = false
   try Text.removeGameOver()
 
-@update = ->
-  Spawn.baddies()
-  UserInput.handle()
-  Text.update()
-  for coin in coins.children
-    if Phaser.distanceBetween(coin, Player.sprite) < 200
-      Phaser.accelerateToObject(coin, Player.sprite, 100)
 
 @dudeKill = (dude, bullet)->
   itemDrop(dude.sprite.body.x, dude.sprite.body.y)
